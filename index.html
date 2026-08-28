@@ -89,14 +89,37 @@ gap:16px
 .brand{
 display:flex;
 align-items:center;
+gap:12px;
 margin-right:auto;
 color:#fff
 }
 
 .brand img{
-height:55px;
+height:48px;
 width:auto;
 object-fit:contain
+}
+
+.brand-text{
+display:flex;
+flex-direction:column;
+justify-content:center;
+line-height:1;
+}
+
+.brand-title{
+font:900 22px/1 'Barlow Condensed', sans-serif;
+color:#ffffff;
+letter-spacing:0.5px;
+text-transform:uppercase;
+}
+
+.brand-subtitle{
+font:800 11px/1 'Barlow Condensed', sans-serif;
+color:#9bb2ce;
+letter-spacing:2px;
+text-transform:uppercase;
+margin-top:3px;
 }
 
 .links{
@@ -662,7 +685,15 @@ text-align:center
 }
 
 .brand img{
-height:42px
+height:40px
+}
+
+.brand-title{
+font-size:18px;
+}
+
+.brand-subtitle{
+font-size:9px;
 }
 
 .nav{
@@ -738,7 +769,11 @@ grid-template-columns:1fr
 <header class="navbar">
   <div class="container nav">
     <a class="brand" href="#inicio">
-      <img src="mvp_image.jpgdjiej-removebg-preview.png" alt="MVP Baseball Academy Sports Complex">
+      <img src="mvp_image.jpgdjiej-removebg-preview.png" alt="MVP Logo">
+      <div class="brand-text">
+        <span class="brand-title">MVP BASEBALL ACADEMY</span>
+        <span class="brand-subtitle">SPORTS COMPLEX</span>
+      </div>
     </a>
 
     <nav class="links">
