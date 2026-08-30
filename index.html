@@ -1080,34 +1080,52 @@ grid-template-columns:1fr
       for (let i = 1; i < rows.length; i++) {
         const [nombre, descripcion, precio, descuento, promocion, mostrar] = rows[i];
 
-        // Verificar si la fila está marcada para mostrar
-        if (mostrar && mostrar.trim().toLowerCase() === 'si') {
+        if (!nombre) continue;
+
+        const itemNombre = nombre.trim().toLowerCase();
+        const estaActivo = mostrar && mostrar.trim().toLowerCase() === 'si';
+
+        // 1. CARGAR TARJETAS DE PROMOCIONES
+        if (estaActivo && promocion && promocion.trim() !== '') {
           const cardHtml = `
             <article class="card">
               <div class="card-title">🔥 ${promocion || 'Promoción'}</div>
               <div class="card-body">
                 <span class="tag">${nombre}</span>
                 <h3>${nombre}</h3>
-                <p>${descripcion}</p>
-                <div class="price">${precio}</div>
+                <p>${descripcion || ''}</p>
+                <div class="price">$${precio}</div>
                 ${descuento ? `<p><b>🎁 ${descuento}</b></p>` : ''}
               </div>
             </article>
           `;
           promosContainer.innerHTML += cardHtml;
         }
+
+        // 2. ACTUALIZAR PRECIOS EN LA SECCIÓN "MVP SHOP"
+        if (estaActivo) {
+          const shopItems = document.querySelectorAll('.shop-item');
+          shopItems.forEach(item => {
+            const itemTexto = item.querySelector('b').textContent.toLowerCase();
+            // Compara si el texto del producto en la web (ej. "🏏 Bat") coincide con lo escrito en Sheets ("bat")
+            if (itemTexto.includes(itemNombre)) {
+              let precioFormateado = precio.toString().startsWith('$') ? precio : `$${precio}`;
+              item.querySelector('strong').textContent = precioFormateado;
+            }
+          });
+        }
       }
     })
-    .catch(err => console.error('Error cargando promociones desde Google Sheets:', err));
+    .catch(err => console.error('Error cargando datos desde Google Sheets:', err));
 
   // Función auxiliar para leer líneas CSV correctamente
   function parseCSV(text) {
-    return text.split('\n').map(row => {
+    return text.trim().split('\n').map(row => {
       let regex = /(?:\"([^\"]*)\"|([^,]+))/g;
       let matches = [];
       let match;
       while ((match = regex.exec(row)) !== null) {
-        matches.push(match[1] || match[2] || '');
+        matches.push((match[1] || match[2] || '').trim());
       }
       return matches;
     });
