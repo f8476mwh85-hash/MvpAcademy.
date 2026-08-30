@@ -855,42 +855,11 @@ grid-template-columns:1fr
           <div class="label">Ofertas especiales</div>
           <h2>Promociones</h2>
         </div>
-        <p>Promociones proporcionadas para agosto y promoción especial por el Torneo Nacional.</p>
+        <p>Promociones vigentes actualizadas directamente desde nuestra base de datos.</p>
       </div>
 
-      <div class="cards">
-        <article class="card">
-          <div class="card-title">🔥 Promoción del Mes · Agosto</div>
-          <div class="card-body">
-            <span class="tag">Bateo & Pitcheo</span>
-            <h3>Paquete Personalizado</h3>
-            <p>4 sesiones personalizadas.</p>
-            <div class="price">$2,200 MXN</div>
-            <p><b>🎁 Incluye 1 Recovery Deportivo de regalo</b> (valorado en $800 MXN).</p>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card-title">⏱ Promoción Torneo Nacional</div>
-          <div class="card-body">
-            <span class="tag">Tiempo limitado</span>
-            <h3>Recovery Deportivo</h3>
-            <p>Precio regular <s>$800</s> → precio promocional:</p>
-            <div class="price">$600 MXN</div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card-title">💪 Paquete Preparación Física</div>
-          <div class="card-body">
-            <span class="tag">2 días por semana</span>
-            <h3>10 sesiones</h3>
-            <p>Paquete de preparación física.</p>
-            <div class="price">$2,500 MXN</div>
-            <p><b>🎁 Incluye 1 Recovery Deportivo de regalo.</b></p>
-          </div>
-        </article>
-      </div>
+      <div class="cards" id="promos-container">
+        </div>
     </div>
   </section>
 
@@ -1096,6 +1065,54 @@ grid-template-columns:1fr
     </div>
   </div>
 </footer>
+
+<script>
+  const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRYGywCGDCZHa-uKFiIYj4gU5raJ5e8adfqKMyiwq0pBPZ1jAosSQiYWmwmJe1MedeXqeX8Q4qBmnz5/pub?output=csv';
+
+  fetch(SHEET_URL)
+    .then(res => res.text())
+    .then(csvText => {
+      const rows = parseCSV(csvText);
+      const promosContainer = document.getElementById('promos-container');
+      promosContainer.innerHTML = '';
+
+      // Omitir el encabezado (fila 0)
+      for (let i = 1; i < rows.length; i++) {
+        const [nombre, descripcion, precio, descuento, promocion, mostrar] = rows[i];
+
+        // Verificar si la fila está marcada para mostrar
+        if (mostrar && mostrar.trim().toLowerCase() === 'si') {
+          const cardHtml = `
+            <article class="card">
+              <div class="card-title">🔥 ${promocion || 'Promoción'}</div>
+              <div class="card-body">
+                <span class="tag">${nombre}</span>
+                <h3>${nombre}</h3>
+                <p>${descripcion}</p>
+                <div class="price">${precio}</div>
+                ${descuento ? `<p><b>🎁 ${descuento}</b></p>` : ''}
+              </div>
+            </article>
+          `;
+          promosContainer.innerHTML += cardHtml;
+        }
+      }
+    })
+    .catch(err => console.error('Error cargando promociones desde Google Sheets:', err));
+
+  // Función auxiliar para leer líneas CSV correctamente
+  function parseCSV(text) {
+    return text.split('\n').map(row => {
+      let regex = /(?:\"([^\"]*)\"|([^,]+))/g;
+      let matches = [];
+      let match;
+      while ((match = regex.exec(row)) !== null) {
+        matches.push(match[1] || match[2] || '');
+      }
+      return matches;
+    });
+  }
+</script>
 
 </body>
 </html>
